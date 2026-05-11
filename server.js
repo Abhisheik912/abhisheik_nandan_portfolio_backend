@@ -1,19 +1,12 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const cors = require('cors');
+const { Resend } = require('resend');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ── EMAIL TRANSPORTER ── //
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD
-  }
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ── HEALTH CHECK ── //
 app.get('/', (req, res) => {
@@ -30,10 +23,10 @@ app.post('/contact', async (req, res) => {
   }
 
   try {
-    await transporter.sendMail({
-      from: `"Portfolio Contact" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
-      replyTo: email,
+    await resend.emails.send({
+      from: 'Portfolio Contact <onboarding@resend.dev>',
+      to: 'abhisheik912@gmail.com',
+      reply_to: email,
       subject: subject ? `[Portfolio] ${subject}` : `[Portfolio] New message from ${name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
